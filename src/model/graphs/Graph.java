@@ -11,9 +11,17 @@ public class Graph {
 	public Graph() {
 		strategy = new DinamicGraphStrategy();
 	}
+	
+	public Graph(String path) {
+		strategy = new StaticGraphStrategy(path);
+	}
 
 	public long getNumberOfNodes() {
 		return strategy.getNumberOfNodes();
+	}
+	
+	public long getNumberOfEdges() {
+		return strategy.getNumberOfEdges();
 	}
 
 	public Iterable<Edge> getEdges() {

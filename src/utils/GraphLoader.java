@@ -4,6 +4,8 @@ import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.storage.GraphStorage;
 import com.graphhopper.util.EdgeIterator;
 
+import hugedataaccess.DataAccess;
+import hugedataaccess.MMapDataAccess;
 import model.graph_entities.*;
 import model.graphs.Graph;
 
@@ -11,7 +13,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class TableParserUtils {
+public class GraphLoader {
 	
 	public static Graph getYuriGraph() {
 		Graph g = new Graph();
@@ -93,7 +95,7 @@ public class TableParserUtils {
 	public static Graph getOSMGraph(String filename) {
 		Graph graph = new Graph();
 		//double initialTime = System.currentTimeMillis();
-		String osmFile = TableParserUtils.class.getResource("/" + filename).getPath();
+		String osmFile = "./resources/" + filename;
 		String hopperDir = "./test/osmimporter";
 		GraphHopper gh = new GraphHopper()
 				.forServer()
@@ -170,10 +172,19 @@ public class TableParserUtils {
 	public static Graph importOrLoad(String dir, String osmFile) {
 		File f = new File(dir + "nodes.txt");
 		if (!f.exists()) {
-			Graph g = TableParserUtils.getOSMGraph(osmFile);
-			TableParserUtils.saveGraph(dir, g);
+			Graph g = GraphLoader.getOSMGraph(osmFile);
+			GraphLoader.saveGraph(dir, g);
 		}
-		return TableParserUtils.loadGraph(dir);
+		return GraphLoader.loadGraph(dir);
+	}
+	
+	public static Graph importOrLoadHuge(String dir, String osmFile) {
+		File f = new File(dir + "nodes");
+		if (!f.exists()) {
+			Graph g = GraphLoader.getOSMGraph(osmFile);
+			GraphLoader.saveHugeGraph(dir, g);
+		}
+		return GraphLoader.loadHugeGraph(dir);
 	}
 	
 	public static void saveGraph(String dir, Graph g) {
@@ -201,6 +212,38 @@ public class TableParserUtils {
 			adjWriter.close();
 		} catch(IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public static void saveHugeGraph(String dir, Graph g) {
+		String edgeFile = dir + "edges";
+		String nodeFile = dir + "nodes";
+		//String adjFile = dir + "adjs";
+		
+		DataAccess nodeAccess = new MMapDataAccess(nodeFile, 32*g.getNumberOfNodes(), 32);
+		//DataAccess adjAccess = new MMapDataAccess(edgeFile, 16*g.getNumberOfNodes(), 16);
+		DataAccess edgeAccess = new MMapDataAccess(edgeFile, 32*g.getNumberOfEdges(), 32);
+		
+		long offset = 0;
+		for (Edge e : g.getEdges()) {
+			edgeAccess.setLong(offset, e.getId());
+			edgeAccess.setLong(offset + 8, e.getFromNodeIndex());
+			edgeAccess.setLong(offset + 16, e.getToNodeIndex());
+			edgeAccess.setDouble(offset + 24, e.getCost());
+			offset += 32;
+		}
+		offset = 0;
+		long adjOffset = 0;
+		for (Node n : g.getNodes()) {
+			nodeAccess.setLong(offset, n.getId());
+			System.out.println(nodeAccess.getLong(offset));
+			nodeAccess.setLong(offset + 8, adjOffset);
+			nodeAccess.setInt(offset + 16, n.getNumberOfAdjacents());
+//				for (Edge adj : n.getAdjacents()) {
+//					adjWriter.write(adj.getGraphIndex() + "\n");
+//				}
+			adjOffset += n.getNumberOfAdjacents();
+			offset += 32;
 		}
 	}
 	
@@ -233,6 +276,34 @@ public class TableParserUtils {
 
 		} catch(IOException e) {
 			e.printStackTrace();
+		}
+		
+		return g;
+	}
+	
+	public static Graph loadHugeGraph(String dir) {
+		Graph g = new Graph(dir);
+		String edgeFile = dir + "edges";
+		String nodeFile = dir + "nodes";
+		//String adjFile = dir + "adjs.txt";
+		
+		DataAccess nodeAccess = new MMapDataAccess(nodeFile, 32);
+		//DataAccess adjAccess = new MMapDataAccess(edgeFile, 16*g.getNumberOfNodes(), 16);
+		DataAccess edgeAccess = new MMapDataAccess(edgeFile, 32);
+		
+		System.out.println(edgeAccess.getCapacity() / 32);
+		
+		for (int off = 0; off < nodeAccess.getCapacity(); off += 32) {
+			System.out.println(nodeAccess.getLong(0));
+			g.addNode(new Node(nodeAccess.getLong(off)));
+		}
+			
+		for (int off = 0; off < edgeAccess.getCapacity(); off += 32) {
+			long id = nodeAccess.getLong(off);
+			long fromIndex = nodeAccess.getLong(off + 8);
+			long toIndex = nodeAccess.getLong(off + 16);
+			double cost = nodeAccess.getDouble(off + 24);
+			g.addEdge(new Edge(id, fromIndex, toIndex, cost));
 		}
 		
 		return g;

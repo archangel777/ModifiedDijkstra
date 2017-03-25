@@ -8,6 +8,8 @@ import model.graph_entities.Node;
 public interface GraphStrategy {
 	
 	long getNumberOfNodes();
+	
+	long getNumberOfEdges();
 
 	Iterable<Edge> getEdges();
 

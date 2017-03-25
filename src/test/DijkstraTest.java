@@ -10,12 +10,13 @@ import com.graphhopper.util.StopWatch;
 import model.auxiliar_structures.DistanceVector;
 import model.graph_entities.Coordinate;
 import model.graphs.Graph;
-import utils.TableParserUtils;;
+import utils.GraphLoader;;
 
 public class DijkstraTest {
 	public static void main(String[] args) {
 		//Graph g = TableParserUtils.getBeijingGraph();
-		Graph g = TableParserUtils.importOrLoad("./test/mygraph/", "berlin-latest.osm.pbf");
+		Graph g = GraphLoader.importOrLoad("./test/mygraph/", "berlin-latest.osm.pbf");
+		//Graph g = GraphLoader.importOrLoadHuge("./test/myHugeGraph/", "berlin-latest.osm.pbf");
 		//Graph g = TableParserUtils.getOSMGraph("monaco-latest.osm.pbf");
 		//ContractedGraph cg = new ContractedGraph(g);
 		

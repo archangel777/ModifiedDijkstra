@@ -1,8 +1,11 @@
 package test;
 
+import model.graphs.Graph;
+import utils.GraphLoader;
+
 public class RandomTest {
 	public static void main(String[] args) {
-		Long x = 2147483647l * 2;
-		System.out.println(x);
+		Graph g = GraphLoader.importOrLoadHuge("./test/myHugeGraph/", "berlin-latest.osm.pbf");
+		System.out.println(g.getNumberOfNodes() + " | " + g.getNumberOfEdges());
 	}
 }
