@@ -1,14 +1,13 @@
-package model;
+package model.auxiliar_structures;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import main.Graph;
 
 public class NormalDistanceVector  implements DistanceVectorStrategy{
 	private DistanceElement[] vector;
 	
-	public NormalDistanceVector(int sourceIndex, Graph g) {
-		vector = new DistanceElement[(int)g.getNumberOfNodes()];
+	public NormalDistanceVector(int sourceIndex, long numberOfNodes) {
+		vector = new DistanceElement[(int)numberOfNodes];
 		DistanceElement first = new DistanceElement(sourceIndex);
 		first.changeDistance(0);
 		vector[sourceIndex] = first;

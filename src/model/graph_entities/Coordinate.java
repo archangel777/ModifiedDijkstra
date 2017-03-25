@@ -1,4 +1,4 @@
-package model;
+package model.graph_entities;
 
 public class Coordinate {
 	private double lat;

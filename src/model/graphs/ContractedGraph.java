@@ -1,24 +1,24 @@
-package main;
-import java.security.Principal;
+package model.graphs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import model.DistanceElement;
-import model.Edge;
-import model.Node;
-import model.Shortcut;
-import model.SpecialNode;
-import utils.BigArray;
+import main.Importance;
+import model.auxiliar_structures.DistanceElement;
+import model.graph_entities.Edge;
+import model.graph_entities.Node;
+import model.graph_entities.Shortcut;
+import model.graph_entities.SpecialNode;
+import utils.BigList;
 
 public class ContractedGraph {
 	
-	private BigArray<SpecialNode> nodes;
-	private List<Edge> edges = new ArrayList<>();
+	private BigList<SpecialNode> nodes;
+	private BigList<Edge> edges = new BigList<>();
 	
 	public ContractedGraph(Graph g) {
-		nodes = new BigArray<>(g.getNumberOfNodes());
+		nodes = new BigList<>(g.getNumberOfNodes());
 		for (Node n : g.getNodes())
 			addNode(new SpecialNode(n.getId()));
 

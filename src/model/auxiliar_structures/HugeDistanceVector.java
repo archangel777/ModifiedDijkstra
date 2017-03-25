@@ -1,18 +1,17 @@
-package model;
+package model.auxiliar_structures;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import main.Graph;
-import utils.BigArray;
+import utils.BigList;
 
 public class HugeDistanceVector implements DistanceVectorStrategy{
-	private BigArray<DistanceElement> vector;
+	private BigList<DistanceElement> vector;
 	
-	public HugeDistanceVector(long sourceIndex, Graph g) {
+	public HugeDistanceVector(long sourceIndex, long numberOfNodes) {
 		DistanceElement first = new DistanceElement(sourceIndex);
 		first.changeDistance(0);
-		vector = new BigArray<>(g.getNumberOfNodes());
+		vector = new BigList<>(numberOfNodes);
 		vector.set(sourceIndex, first);
 	}
 	

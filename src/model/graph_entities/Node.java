@@ -1,4 +1,5 @@
-package model;
+package model.graph_entities;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +39,16 @@ public class Node extends GraphEntity {
 		return adjacents;
 	}
 	
+	public int getNumberOfAdjacents() {
+		return adjacents.size();
+	}
+	
 	public List<Edge> getParents() {
 		return parents;
+	}
+	
+	public int getNumberOfParents() {
+		return parents.size();
 	}
 	
 	public double getCostToNode(int otherIndex) {

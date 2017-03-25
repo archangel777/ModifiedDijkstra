@@ -1,4 +1,4 @@
-package model;
+package model.graph_entities;
 import java.util.ArrayList;
 
 public class Edge extends GraphEntity {

@@ -1,21 +1,20 @@
-package main;
+package model.graphs;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 
-import model.Coordinate;
-import model.DistanceElement;
-import model.DistanceVector;
-import model.Edge;
-import model.Node;
+import model.auxiliar_structures.DistanceElement;
+import model.auxiliar_structures.DistanceVector;
+import model.graph_entities.Coordinate;
+import model.graph_entities.Edge;
+import model.graph_entities.Node;
+import utils.BigList;
 
-public class DinamicGraph implements Graph{
-	private List<Node> nodes = new ArrayList<>();
-	private List<Edge> edges = new ArrayList<>();
+public class DinamicGraphStrategy implements GraphStrategy{
+	private BigList<Node> nodes = new BigList<>();
+	private BigList<Edge> edges = new BigList<>();
 	private HashMap<Long, Long> idToIndex = new HashMap<>();
 	private HashMap<Coordinate, Long> coordToIndex = new HashMap<>();
 	
@@ -32,8 +31,8 @@ public class DinamicGraph implements Graph{
 	public void addEdge(Edge edge) {
 		edges.add(edge);
 		edge.setGraphIndex(edges.size() - 1);
-		nodes.get((int)edge.getFromNodeIndex()).addAdjacent(edge);
-		nodes.get((int)edge.getToNodeIndex()).addParent(edge);
+		nodes.get(edge.getFromNodeIndex()).addAdjacent(edge);
+		nodes.get(edge.getToNodeIndex()).addParent(edge);
 	}
 	
 	public long getNodeIndexById(Long nodeId) {
@@ -55,14 +54,14 @@ public class DinamicGraph implements Graph{
 	}
 	
 	public Node getNode(long index) {
-		return nodes.get((int)index);
+		return nodes.get(index);
 	}
 	
-	public List<Node> getNodes() {
+	public Iterable<Node> getNodes() {
 		return nodes;
 	}
 	
-	public List<Edge> getEdges() {
+	public Iterable<Edge> getEdges() {
 		return edges;
 	}
 	
@@ -79,7 +78,7 @@ public class DinamicGraph implements Graph{
 	}
 		
 	public DistanceVector runDijkstra(long sourceIndex, long targetIndex) {
-		DistanceVector vector = new DistanceVector(sourceIndex, this);
+		DistanceVector vector = new DistanceVector(sourceIndex, this.getNumberOfNodes());
 		//DistanceVector vector = new HugeDistanceVector(sourceIndex, this);
 		Queue<DistanceElement> toVisit = new PriorityQueue<>();
 		

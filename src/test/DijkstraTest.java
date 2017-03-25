@@ -1,16 +1,14 @@
 package test;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 
 import com.graphhopper.util.StopWatch;
 
-import main.Graph;
-import model.Coordinate;
-import model.DistanceVector;
+import model.auxiliar_structures.DistanceVector;
+import model.graph_entities.Coordinate;
+import model.graphs.Graph;
 import utils.TableParserUtils;;
 
 public class DijkstraTest {
@@ -49,7 +47,7 @@ public class DijkstraTest {
 				StopWatch local = new StopWatch();
 				sw.start();
 				local.start();
-				DistanceVector v = g.runDijkstra(sourceIndex, targetIndex);
+				g.runDijkstra(sourceIndex, targetIndex);
 				local.stop();
 				sw.stop();
 				//System.out.println("Time: " + local.getTime());

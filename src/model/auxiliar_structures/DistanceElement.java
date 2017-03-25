@@ -1,4 +1,4 @@
-package model;
+package model.auxiliar_structures;
 
 public class DistanceElement implements Comparable<DistanceElement>{
 	private Long realId;

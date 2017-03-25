@@ -1,4 +1,4 @@
-package model;
+package model.graph_entities;
 
 import main.Importance;
 

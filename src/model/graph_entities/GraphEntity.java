@@ -1,4 +1,4 @@
-package model;
+package model.graph_entities;
 
 public abstract class GraphEntity {
 	private long graphIndex;

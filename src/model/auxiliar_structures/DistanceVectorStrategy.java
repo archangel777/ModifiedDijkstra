@@ -1,4 +1,4 @@
-package model;
+package model.auxiliar_structures;
 
 public interface DistanceVectorStrategy {
 	

@@ -1,18 +1,14 @@
-package model;
-
-import main.Graph;
-import utils.BigArray;
+package model.auxiliar_structures;
 
 public class DistanceVector{
 	
 	private DistanceVectorStrategy strategy;
 	
-	public DistanceVector(long sourceIndex, Graph g) {
-		long size = g.getNumberOfNodes();
-		if (size <= Integer.MAX_VALUE)
-			strategy = new NormalDistanceVector((int)sourceIndex, g);
+	public DistanceVector(long sourceIndex, long numberOfNodes) {
+		if (numberOfNodes <= Integer.MAX_VALUE)
+			strategy = new NormalDistanceVector((int)sourceIndex, numberOfNodes);
 		else
-			strategy = new HugeDistanceVector(sourceIndex, g);
+			strategy = new HugeDistanceVector(sourceIndex, numberOfNodes);
 	}
 		
 	public void addElement(DistanceElement element) {

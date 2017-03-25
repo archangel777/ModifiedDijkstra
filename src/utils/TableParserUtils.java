@@ -4,26 +4,17 @@ import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.storage.GraphStorage;
 import com.graphhopper.util.EdgeIterator;
 
-import main.DinamicGraph;
-import main.Graph;
-import model.Coordinate;
-import model.Edge;
-import model.Node;
+import model.graph_entities.*;
+import model.graphs.Graph;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class TableParserUtils {
 	
 	public static Graph getYuriGraph() {
-		Graph g = new DinamicGraph();
+		Graph g = new Graph();
 		g.addNode(new Node(1l));
 		g.addNode(new Node(2l));
 		g.addNode(new Node(3l));
@@ -43,7 +34,7 @@ public class TableParserUtils {
 	}
 	
 	public static Graph getSmallTestGraph() {
-		Graph g = new DinamicGraph();
+		Graph g = new Graph();
 		g.addNode(new Node(1l));
 		g.addNode(new Node(2l));
 		g.addNode(new Node(3l));
@@ -62,7 +53,7 @@ public class TableParserUtils {
 	}
 	
 	public static Graph getMediumTestGraph() {
-		Graph g = new DinamicGraph();
+		Graph g = new Graph();
 		g.addNode(new Node(1l));
 		g.addNode(new Node(2l));
 		g.addNode(new Node(3l));
@@ -100,8 +91,8 @@ public class TableParserUtils {
 	}
 	
 	public static Graph getOSMGraph(String filename) {
-		Graph graph = new DinamicGraph();
-		double initialTime = System.currentTimeMillis();
+		Graph graph = new Graph();
+		//double initialTime = System.currentTimeMillis();
 		String osmFile = TableParserUtils.class.getResource("/" + filename).getPath();
 		String hopperDir = "./test/osmimporter";
 		GraphHopper gh = new GraphHopper()
@@ -199,11 +190,11 @@ public class TableParserUtils {
 			}
 			int offset = 0;
 			for (Node n : g.getNodes()) {
-				nodeWriter.write(n.getId() + " " + offset + " " + n.getAdjacents().size() + "\n");
+				nodeWriter.write(n.getId() + " " + offset + " " + n.getNumberOfAdjacents() + "\n");
 				for (Edge adj : n.getAdjacents()) {
 					adjWriter.write(adj.getGraphIndex() + "\n");
 				}
-				offset += n.getAdjacents().size();
+				offset += n.getNumberOfAdjacents();
 			}
 			edgeWriter.close();
 			nodeWriter.close();
@@ -214,7 +205,7 @@ public class TableParserUtils {
 	}
 	
 	public static Graph loadGraph(String dir) {
-		Graph g = new DinamicGraph();
+		Graph g = new Graph();
 		String edgeFile = dir + "edges.txt";
 		String nodeFile = dir + "nodes.txt";
 		//String adjFile = dir + "adjs.txt";
