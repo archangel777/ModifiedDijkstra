@@ -3,6 +3,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.graphhopper.util.StopWatch;
 
@@ -39,11 +40,18 @@ public class DijkstraTest {
 		}
 		
 		else {
-			int numberOfExperiments = 100;
+			int numberOfExperiments = 500;
+			ArrayList<Long> testSources = new ArrayList<>();
+			ArrayList<Long> testTargets = new ArrayList<>();
+			for (int i = 0; i < numberOfExperiments; i++) {
+				testSources.add(g.getRandomNodeIndex());
+				testTargets.add(g.getRandomNodeIndex());
+			}
+			
 			StopWatch sw = new StopWatch();
 			for (int i = 0; i < numberOfExperiments; i++) {
-				long sourceIndex = g.getRandomNodeIndex();
-				long targetIndex = g.getRandomNodeIndex();
+				long sourceIndex = testSources.get(i);
+				long targetIndex = testTargets.get(i);
 				StopWatch local = new StopWatch();
 				sw.start();
 				local.start();
@@ -55,6 +63,22 @@ public class DijkstraTest {
 			}
 		
 			System.out.println("Average Time: " + (sw.getTime()/numberOfExperiments));
+			
+			sw = new StopWatch();
+			for (int i = 0; i < numberOfExperiments; i++) {
+				long sourceIndex = testSources.get(i);
+				long targetIndex = testTargets.get(i);
+				StopWatch local = new StopWatch();
+				sw.start();
+				local.start();
+				g.runLegacyDijkstra(sourceIndex, targetIndex);
+				local.stop();
+				sw.stop();
+				//System.out.println("Time: " + local.getTime());
+				//System.out.println("Distance: " + v.getDistance(targetIndex) + " meters");
+			}
+		
+			System.out.println("Average Time of legacy: " + (sw.getTime()/numberOfExperiments));
 		
 		}
 

@@ -85,12 +85,13 @@ public class DinamicGraphStrategy implements GraphStrategy{
 		toVisit.add(vector.getElement(sourceIndex));
 		while (!toVisit.isEmpty()) {
 			DistanceElement min = toVisit.remove();
-			if (targetIndex != -1 && targetIndex == min.getIndex()) {
-				return vector;
-			}
 			
 			if (min.isVisited()) continue;
 			min.setVisited(true);
+			
+			if (targetIndex != -1 && targetIndex == min.getIndex()) {
+				return vector;
+			}
 			
 			expandElement(min, vector, toVisit);
 		}
@@ -113,5 +114,35 @@ public class DinamicGraphStrategy implements GraphStrategy{
 	
 	public long getRandomNodeIndex() {
 		return Math.abs(new Random().nextLong()%this.getNumberOfNodes());
+	}
+
+	@Override
+	public DistanceVector runLegacyDijkstra(long sourceIndex, long targetIndex) {
+		DistanceVector vector = new DistanceVector(sourceIndex, this.getNumberOfNodes());
+		//DistanceVector vector = new HugeDistanceVector(sourceIndex, this);
+		Queue<DistanceElement> toVisit = new PriorityQueue<>();
+		
+		toVisit.add(vector.getElement(sourceIndex));
+		while (!toVisit.isEmpty()) {
+			DistanceElement min = toVisit.remove();
+			min.setVisited(true);
+			if (targetIndex != -1 && targetIndex == min.getIndex()) {
+				return vector;
+			}
+			
+			long minIndex = min.getIndex();
+			for (Edge e : nodes.get((int)minIndex).getAdjacents()) {
+				DistanceElement neighbor = vector.getElement(e.getToNodeIndex());
+				if (neighbor.isVisited()) continue;
+				double newDistance = min.getDistance() + e.getCost();
+				if (newDistance < neighbor.getDistance()) {
+					toVisit.remove(neighbor);
+					neighbor.update(newDistance, minIndex);
+					toVisit.add(neighbor);
+				}
+			}
+		}
+		
+		return vector;
 	}
 }

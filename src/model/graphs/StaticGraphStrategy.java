@@ -61,4 +61,10 @@ public class StaticGraphStrategy implements GraphStrategy{
 		return null;
 	}
 
+	@Override
+	public DistanceVector runLegacyDijkstra(long sourceIndex, long targetIndex) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

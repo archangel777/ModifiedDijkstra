@@ -24,5 +24,7 @@ public interface GraphStrategy {
 	long getNodeIndexByCoord(Coordinate fromCoord);
 
 	Node getNode(long sourceIndex);
+
+	DistanceVector runLegacyDijkstra(long sourceIndex, long targetIndex);
 	
 }

@@ -39,6 +39,10 @@ public class Graph {
 	public DistanceVector runDijkstra(long sourceIndex, long targetIndex) {
 		return strategy.runDijkstra(sourceIndex, targetIndex);
 	}
+	
+	public DistanceVector runLegacyDijkstra(long sourceIndex, long targetIndex) {
+		return strategy.runLegacyDijkstra(sourceIndex, targetIndex);
+	}
 
 	public long getNodeIndexByCoord(Coordinate fromCoord) {
 		return strategy.getNodeIndexByCoord(fromCoord);
