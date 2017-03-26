@@ -14,10 +14,12 @@ import utils.GraphLoader;;
 
 public class DijkstraTest {
 	public static void main(String[] args) {
-		//Graph g = TableParserUtils.getBeijingGraph();
-		Graph g = GraphLoader.importOrLoad("./test/mygraph/", "berlin-latest.osm.pbf");
-		//Graph g = GraphLoader.importOrLoadHuge("./test/myHugeGraph/", "berlin-latest.osm.pbf");
-		//Graph g = TableParserUtils.getOSMGraph("monaco-latest.osm.pbf");
+		//GraphLoader hugeLoader = new GraphLoader(true);
+		GraphLoader loader = new GraphLoader(false);
+		//Graph g = loader.getBeijingGraph();
+		Graph g = loader.importOrLoad("berlin-latest.osm.pbf");
+		//Graph g = hugeLoader.importOrLoadHuge("berlin-latest.osm.pbf");
+		//Graph g = loader.getOSMGraph("monaco-latest.osm.pbf");
 		//ContractedGraph cg = new ContractedGraph(g);
 		
 		if (args.length == 5) {

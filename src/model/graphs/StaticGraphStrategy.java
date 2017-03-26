@@ -3,7 +3,6 @@ package model.graphs;
 import java.io.File;
 
 import hugedataaccess.DataAccess;
-import hugedataaccess.MMapDataAccess;
 import model.auxiliar_structures.DistanceVector;
 import model.graph_entities.Coordinate;
 import model.graph_entities.Edge;
