@@ -17,9 +17,10 @@ public class DijkstraTest {
 		//GraphLoader hugeLoader = new GraphLoader(true);
 		GraphLoader loader = new GraphLoader(false);
 		//Graph g = loader.getBeijingGraph();
-		Graph g = loader.importOrLoad("berlin-latest.osm.pbf");
+		//Graph g = loader.importOrLoad("berlin-latest.osm.pbf");
 		//Graph g = hugeLoader.importOrLoadHuge("berlin-latest.osm.pbf");
 		//Graph g = loader.getOSMGraph("monaco-latest.osm.pbf");
+		Graph g = loader.generateRandomGraph(2000, 0.3f);
 		//ContractedGraph cg = new ContractedGraph(g);
 		
 		if (args.length == 5) {
@@ -43,7 +44,7 @@ public class DijkstraTest {
 		}
 		
 		else {
-			int numberOfExperiments = 500;
+			int numberOfExperiments = 100;
 			ArrayList<Long> testSources = new ArrayList<>();
 			ArrayList<Long> testTargets = new ArrayList<>();
 			for (int i = 0; i < numberOfExperiments; i++) {

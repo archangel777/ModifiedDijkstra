@@ -39,4 +39,8 @@ public class GraphLoader {
 		return strategy.loadGraph();
 	}
 	
+	public Graph generateRandomGraph(long nNodes, float density) {
+		return strategy.generateRandomGraph(nNodes, density);
+	}
+	
 }

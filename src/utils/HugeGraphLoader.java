@@ -1,12 +1,19 @@
 package utils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.storage.GraphStorage;
+import com.graphhopper.storage.NodeAccess;
 import com.graphhopper.util.EdgeIterator;
 
 import hugedataaccess.DataAccess;
@@ -124,11 +131,14 @@ public class HugeGraphLoader implements GraphLoaderStrategy{
 			long externalEdgeId = edgeIterator.getEdge();
 			double distance = edgeIterator.getDistance(); 
 			
-			double fromLat = gs.getNodeAccess().getLatitude((int)externalFromNodeId);
-			double fromLng = gs.getNodeAccess().getLongitude((int)externalFromNodeId);	
+			NodeAccess access = gs.getNodeAccess();
+			
+			double fromLat = access.getLatitude((int)externalFromNodeId);
+			double fromLng = access.getLongitude((int)externalFromNodeId);	
 
-			double toLat = gs.getNodeAccess().getLatitude((int)externalToNodeId);
-			double toLng = gs.getNodeAccess().getLongitude((int)externalToNodeId);
+			double toLat = access.getLatitude((int)externalToNodeId);
+			double toLng = access.getLongitude((int)externalToNodeId);
+			
 			// Nodes
 			Node node;
 			if (!set.contains(externalFromNodeId)) {
@@ -144,38 +154,141 @@ public class HugeGraphLoader implements GraphLoaderStrategy{
 				idToGraphIndex.put(externalToNodeId, node.getGraphIndex());
 			}
 			// Edges
-			int direction = 9999;
-			try {
-				direction = getDirection(edgeIterator.getFlags());
-			} catch (Exception e) {}
-			if(externalFromNodeId == externalToNodeId) {
-				//System.out.println("Edge not created");
-				continue;
-			}
+			int direction = getDirection(edgeIterator.getFlags());
+			
+			if(externalFromNodeId == externalToNodeId) continue;
+			
 			if (direction == 0 || direction == 1)
 				graph.addEdge(new Edge(externalEdgeId, idToGraphIndex.get(externalFromNodeId), idToGraphIndex.get(externalToNodeId), distance));
 			if (direction == 0 || direction == -1)
 				graph.addEdge(new Edge(externalEdgeId, idToGraphIndex.get(externalToNodeId), idToGraphIndex.get(externalFromNodeId), distance));
-			//if (direction == 9999)
-				//System.out.println("Edge not created. Invalid direction");
+
 		}
-		//System.out.println("Time = " + (System.currentTimeMillis() - initialTime));
 		return graph;
+    }
+	
+	public void parseGraph(String fromFile) {
+		this.parseGraph(fromFile, "./graph/");
+	}
+	
+	public void parseGraph(String fromFile, String toDir) {
+		String tmpDirName = "./tmp/";
+		File tmpDir = new File(tmpDirName);
+		if (!tmpDir.exists())
+			tmpDir.mkdirs();
+		File tmp1, tmp2;
+		
+		/********************
+		 *  Hopper Loading  *
+		 ********************/
+		String osmFile = "./resources/" + fromFile;
+		String hopperDir = "./test/osmimporter";
+		GraphHopper gh = new GraphHopper()
+				.forServer()
+				.setOSMFile(osmFile)
+				.setGraphHopperLocation(hopperDir)
+				.setEncodingManager(new EncodingManager("car"))
+				.importOrLoad();
+		GraphStorage gs = gh.getGraph();
+		EdgeIterator edgeIterator = gs.getAllEdges();
+		
+		tmp1 = new File(tmpDirName + "tmp1.txt");
+		BufferedReader reader;
+		BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(tmp1));
+		
+			while(edgeIterator.next()) {
+				long externalEdgeId = edgeIterator.getEdge();
+				long externalFromNodeId = edgeIterator.getBaseNode();
+				long externalToNodeId = edgeIterator.getAdjNode();
+				double distance = edgeIterator.getDistance();
+				writer.write(externalEdgeId + " " + externalFromNodeId + " " + externalToNodeId + " " + distance + "\n");
+			}
+			
+			/*****************
+			 *    Parsing    *
+			 *****************/
+			
+			int bufferLimit = 1000;
+			
+			while (tmp1.length() > 0) {
+				
+				tmp2 = new File(tmpDirName + "tmp2.txt");
+				reader = new BufferedReader(new FileReader(tmp1));
+				writer = new BufferedWriter(new FileWriter(tmp2));
+				
+				HashMap<Long, Long> idToGraphIndex = new HashMap<>();
+				ArrayList<Long> nodes = new ArrayList<>();
+				
+				String line;
+				while ((line = reader.readLine()) != null) {
+					String[] splt = line.split(" ");
+					long externalEdgeId = Long.parseLong(splt[0]);
+					long externalFromNodeId = Long.parseLong(splt[1]);
+					long externalToNodeId = Long.parseLong(splt[2]);
+					double distance = Double.parseDouble(splt[3]);
+				}
+				
+				tmp1.delete();
+				tmp2.renameTo(new File("tmp1.txt"));
+				tmp1 = new File(tmpDirName + "tmp1.txt");
+			}
+		
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		HashSet<Long> set = new HashSet<>();
+		HashMap<Long, Long> idToGraphIndex = new HashMap<>();
+		
+		while(edgeIterator.next()) {
+			long externalEdgeId = edgeIterator.getEdge();
+			long externalFromNodeId = edgeIterator.getBaseNode();
+			long externalToNodeId = edgeIterator.getAdjNode();
+			double distance = edgeIterator.getDistance(); 
+			
+			double fromLat = gs.getNodeAccess().getLatitude((int)externalFromNodeId);
+			double fromLng = gs.getNodeAccess().getLongitude((int)externalFromNodeId);	
+
+			double toLat = gs.getNodeAccess().getLatitude((int)externalToNodeId);
+			double toLng = gs.getNodeAccess().getLongitude((int)externalToNodeId);
+			// Nodes
+			Node node;
+			if (!set.contains(externalFromNodeId)) {
+				node = new Node(externalFromNodeId, new Coordinate(fromLat, fromLng));
+				//graph.addNode(node);
+				set.add(externalFromNodeId);
+				idToGraphIndex.put(externalFromNodeId, node.getGraphIndex());
+			}
+			if (!set.contains(externalToNodeId)) {
+				node = new Node(externalToNodeId, new Coordinate(toLat, toLng));
+				//graph.addNode(node);
+				set.add(externalToNodeId);
+				idToGraphIndex.put(externalToNodeId, node.getGraphIndex());
+			}
+			// Edges
+			int direction = getDirection(edgeIterator.getFlags());
+
+			if(externalFromNodeId == externalToNodeId) continue;
+			
+			/*if (direction == 0 || direction == 1)
+				graph.addEdge(new Edge(externalEdgeId, idToGraphIndex.get(externalFromNodeId), idToGraphIndex.get(externalToNodeId), distance));
+			if (direction == 0 || direction == -1)
+				graph.addEdge(new Edge(externalEdgeId, idToGraphIndex.get(externalToNodeId), idToGraphIndex.get(externalFromNodeId), distance));
+			 */
+		}
     }
 	
 	private int getDirection(long flags) {
 		long direction = (flags & 3);
 
-		if(direction ==  1) {
-			return 1;   // One direction: From --> To 
-		} else if(direction ==  2) {
-			return -1;  // One direction: To --> From
-		} else if(direction == 3) {
-			return 0;   // Bidirectional: To <--> From
-		}
-		else {
-			throw new IllegalArgumentException("Invalid flag: " + direction);
-		}
+		if(direction ==  1) return 1;   // One direction: From --> To 
+		if(direction ==  2) return -1;  // One direction: To --> From
+		if(direction == 3) return 0;   // Bidirectional: To <--> From
+		
+		return 9999;
 	}
 	
 	public Graph importOrLoad(String osmFile) {
@@ -242,5 +355,11 @@ public class HugeGraphLoader implements GraphLoaderStrategy{
 		}
 		
 		return g;
+	}
+
+	@Override
+	public Graph generateRandomGraph(long nNodes, float density) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

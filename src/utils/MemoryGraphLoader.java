@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
 import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.util.EncodingManager;
@@ -248,4 +249,28 @@ public class MemoryGraphLoader implements GraphLoaderStrategy{
 		
 		return g;
 	}
+
+	@Override
+	public Graph generateRandomGraph(long nNodes, float density) {
+		Graph g = new Graph();
+		Random r = new Random();
+		
+		for (long i = 0; i < nNodes; i++) {
+			g.addNode(new Node(i));
+		}
+		long id = 0;
+		for (long i = 0; i < g.getNumberOfNodes(); i++) {
+			System.out.println(i*100. / g.getNumberOfNodes());
+			
+			for (long j = 0; j < g.getNumberOfNodes(); j++) {
+				if (i != j && r.nextFloat() <= density) {
+					g.addEdge(new Edge(id, i, j, r.nextInt()%100));
+					id++;
+				}
+			}
+		}
+		
+		return g;
+	}
+	
 }

@@ -17,4 +17,6 @@ public interface GraphLoaderStrategy {
 		
 	public Graph loadGraph();
 	
+	public Graph generateRandomGraph(long nNodes, float density);
+	
 }
